@@ -2,6 +2,17 @@
 
 Este proyecto es una aplicación web desarrollada con Vue 3 que utiliza la Poke API para mostrar un listado de Pokémon, permitiendo al usuario ver los detalles de cada Pokémon seleccionado y agregarlos a su equipo personalizado.
 
+## Instalación
+
+Para instalar las dependencias necesarias, ejecuta:
+
+`npm install`
+
+## Correr proyecto local
+
+Para correr el proyecto en su maquina local ejecuta:
+
+`npm run dev`
 ## Características
 
 - **Listado de Pokémon**: Muestra todos los Pokémon disponibles utilizando la Poke API.
@@ -16,9 +27,5 @@ Este proyecto es una aplicación web desarrollada con Vue 3 que utiliza la Poke 
 - **Pinia**: Gestión del estado en aplicaciones Vue.
 - **Vue Router**: Enrutador oficial para Vue.js.
 - **Vue3-ApexCharts**: Gráficos interactivos para Vue 3.
-- **Vite**: Herramienta de compilación para proyectos Vue.js, acelerando el proceso de desarrollo.
-
-## Instalación
-
-Antes de comenzar, asegúrate de tener Node.js versión 20+ instalada en tu sistema. Para instalar las dependencias necesarias, navega hasta el directorio del proyecto y ejecuta:
+- **Vite**: Herramienta de desarrollo rápida para proyectos de frontend.
 

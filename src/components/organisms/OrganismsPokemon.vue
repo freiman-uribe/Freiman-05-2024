@@ -52,172 +52,113 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
-  import { useRoute } from 'vue-router';
-  import axios from 'axios';
-  import { usePokemonStore } from '../../store/usePokemonStore';
-  
-  import AtomImage from '../atoms/AtomImage.vue';
-  import AtomBadges from '../atoms/AtomBadges.vue';
-  import AtomChart from '../atoms/AtomChart.vue';
-  import AtomAudioPlayer from '../molecules/MoleculeAudioPlayer.vue';
-  
-  // Define interfaces for Pokemon data
-  interface PokemonType {
-    type: {
-      name: string;
-    };
-  }
-  
-  interface PokemonStat {
-    base_stat: number;
-    stat: {
-      name: string;
-    };
-  }
-  
-  interface PokemonSprites {
-    other: {
-      dream_world: {
-        front_default: string;
-      };
-    };
-  }
-  
-  interface Pokemon {
-    name: string;
-    weight: number;
-    height: number;
-    sprites: PokemonSprites;
-    types: PokemonType[];
-    stats: PokemonStat[];
-    cries: {
-      latest: string;
-      legacy: string;
-    };
-  }
-  
-  interface SeriesData {
-    name: string;
-    data: number[];
-  }
-  
-  interface ChartOptions {
-    title?: {
-      text: string;
-    };
-    xaxis?: {
-      categories: string[];
-    };
-  }
-  
-  interface Evolution {
-    id: number;
-    name: string;
-    sprites: {
-      other: {
-        dream_world: {
-          front_default: string;
-        };
-      };
-    };
-  }
-  
-  // Setup state variables
-  const route = useRoute();
-  const store = usePokemonStore();
-  
-  const pokemon = ref<Pokemon | null>(null);
-  const pokemonImage = ref<string>('');
-  const pokemonCrie = ref<string>('');
-  const pokemonDesc = ref<string>('');
-  
-  const series = ref<SeriesData[]>([]);
-  const evolutions = ref<Evolution[]>([]);
-  const evolutionNames = ref<string[]>([]);
-  const chartOptions = ref<ChartOptions>({});
-  
-  const fetchPokemonSpecie = async () => {
-    try {
-      const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${route.params.id}`);
-      let description = '';
-      data.flavor_text_entries.forEach((element: any) => {
-        if (element.language.name === 'es') {
-          description += `${element.flavor_text} `;
-        }
-      });
-      pokemonDesc.value = description.trim();
-      await fetchEvolutions(data.evolution_chain.url);
-    } catch (error) {
-      console.error('Error al obtener la especie del Pokémon:', error);
-    }
-  };
-  
-  const fetchEvolutions = async (urlEvolutions: string) => {
-    try {
-      const { data } = await axios.get(urlEvolutions);
-      const evolutionChain = data.chain;
-  
-      const getEvolutionNames = (chain: any) => {
-        evolutionNames.value.push(chain.species.name);
-        chain.evolves_to.forEach((evolution: any) => getEvolutionNames(evolution));
-      };
-  
-      getEvolutionNames(evolutionChain);
-  
-      const evolutionsList: Evolution[] = [];
-      for (const name of evolutionNames.value) {
-        const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`);
-        evolutionsList.push(data);
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
+import { usePokemonStore } from '../../store/usePokemonStore';
+
+import AtomImage from '../atoms/AtomImage.vue';
+import AtomBadges from '../atoms/AtomBadges.vue';
+import AtomChart from '../atoms/AtomChart.vue';
+import AtomAudioPlayer from '../molecules/MoleculeAudioPlayer.vue';
+
+// Interfaces remain unchanged
+
+// Setup state variables remain unchanged
+
+const route = useRoute();
+const store = usePokemonStore();
+
+const pokemon = ref<Pokemon | null>(null);
+const pokemonImage = ref<string>('');
+const pokemonCrie = ref<string>('');
+const pokemonDesc = ref<string>('');
+
+const series = ref<SeriesData[]>([]);
+const evolutions = ref<Evolution[]>([]);
+const evolutionNames = ref<string[]>([]);
+const chartOptions = ref<ChartOptions>({});
+
+const fetchPokemonSpecie = async () => {
+  try {
+    const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${route.params.id}`);
+    let description = '';
+    data.flavor_text_entries.forEach((element: any) => {
+      if (element.language.name === 'es') {
+        description += `${element.flavor_text} `;
       }
-  
-      evolutions.value = evolutionsList;
-    } catch (error) {
-      console.error('Error fetching evolutions:', error);
-    }
-  };
-  
-  const list = async () => {
-    await store.fetchFindPokemon(route.params.id as number).then(async () => {
-      const fetchedPokemon = store.getPokemon as Pokemon;
-      pokemon.value = fetchedPokemon;
-      pokemonImage.value = fetchedPokemon.sprites.other.dream_world.front_default;
-      pokemonCrie.value = fetchedPokemon.cries.latest || fetchedPokemon.cries.legacy;
-  
-      const categories = fetchedPokemon.stats.map((item: PokemonStat) => item.stat.name);
-      const data = fetchedPokemon.stats.map((item: PokemonStat) => item.base_stat);
-  
-      series.value = [{
-        name: 'Base Stat',
-        data: data
-      }];
-  
-      chartOptions.value = {
-        xaxis: {
-          categories: categories
-        }
-      };
     });
-  };
-  
-  onMounted(async () => {
-    await list();
-    await fetchPokemonSpecie();
+    pokemonDesc.value = description.trim();
+    await fetchEvolutions(data.evolution_chain.url);
+  } catch (error) {
+    console.error('Error al obtener la especie del Pokémon:', error);
+  }
+};
+
+const fetchEvolutions = async (urlEvolutions: string) => {
+  try {
+    const { data } = await axios.get(urlEvolutions);
+    const evolutionChain = data.chain;
+
+    const getEvolutionNames = (chain: any) => {
+      evolutionNames.value.push(chain.species.name);
+      chain.evolves_to.forEach((evolution: any) => getEvolutionNames(evolution));
+    };
+
+    getEvolutionNames(evolutionChain);
+
+    const evolutionsList: Evolution[] = [];
+    for (const name of evolutionNames.value) {
+      const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`);
+      evolutionsList.push(data);
+    }
+
+    evolutions.value = evolutionsList;
+  } catch (error) {
+    console.error('Error fetching evolutions:', error);
+  }
+};
+
+const list = async () => {
+  await store.fetchFindPokemon(route.params.id as number).then(async () => {
+    const fetchedPokemon = store.getPokemon as Pokemon;
+    pokemon.value = fetchedPokemon;
+    pokemonImage.value = fetchedPokemon.sprites.other.dream_world.front_default;
+    pokemonCrie.value = fetchedPokemon.cries.latest || fetchedPokemon.cries.legacy;
+
+    const categories = fetchedPokemon.stats.map((item: PokemonStat) => item.stat.name);
+    const data = fetchedPokemon.stats.map((item: PokemonStat) => item.base_stat);
+
+    series.value = [{
+      name: 'Base Stat',
+      data: data
+    }];
+
+    chartOptions.value = {
+      xaxis: {
+        categories: categories
+      }
+    };
   });
+};
+
+onMounted(async () => {
+  await list();
+  await fetchPokemonSpecie();
+});
 </script>
-  
+
 <style scoped>
-  .audio-player {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-  }
-  
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
+.audio-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
 </style>
-  

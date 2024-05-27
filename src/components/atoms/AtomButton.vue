@@ -2,7 +2,7 @@
     <button :class="props.class" @click="onClick" :type="props.type">{{ props.text }}</button>
 </template>
    
-<script setup>
+<script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
@@ -14,7 +14,9 @@ const props = defineProps({
     class: String
 });
 
-const emit = defineEmits(['clicked']);
+const emit = defineEmits<{
+    (e: 'clicked'): void;
+}>();
 
 const onClick = () => {
     emit('clicked');

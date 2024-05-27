@@ -17,7 +17,7 @@
   const store = usePokemonStore();
   
   interface Pokemon {
-    id: number; // Asumiendo que el ID es un número basado en el uso en la plantilla
+    id: number;
     name: string;
     url: string;
     sprites: {
@@ -29,9 +29,7 @@
     };
   }
   
-  defineProps<{
-    pokemon: Pokemon;
-  }>();
+  const props = defineProps<{ pokemon: Pokemon }>();
   
   const selectTeam = (pokemon: Pokemon) => {
     store.selectPokemonTeam(pokemon);

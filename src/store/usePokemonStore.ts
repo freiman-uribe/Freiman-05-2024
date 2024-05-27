@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import axios from '../ultils/axios';
+import axios from 'axios';
 
 // Define interfaces for Pokemon data
 interface PokemonType {
@@ -24,6 +24,7 @@ interface PokemonSprites {
 }
 
 interface Pokemon {
+  id: number; // Adding 'id' field as it is used in the selectPokemonTeam action
   name: string;
   weight: number;
   sprites: PokemonSprites;
@@ -48,9 +49,9 @@ export const usePokemonStore = defineStore('pokemon', {
     teamPokemon: []
   }),
   actions: {
-    async fetchFindPokemon(id: string) {
+    async fetchFindPokemon(id: number) { // Change 'id' type to number to match usage in the template
       try {
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const response = await axios.get<Pokemon>(`https://pokeapi.co/api/v2/pokemon/${id}`);
         this.pokemon = response.data;
       } catch (error) {
         console.error('Error fetching Pokemon:', error);
@@ -60,7 +61,7 @@ export const usePokemonStore = defineStore('pokemon', {
       try {
         const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
         const pokemonPromises = response.data.results.map(async (pokemon: { url: string }) => {
-          const { data } = await axios.get(pokemon.url);
+          const { data } = await axios.get<Pokemon>(pokemon.url);
           return data;
         });
         const pokemons = await Promise.all(pokemonPromises);
@@ -69,17 +70,13 @@ export const usePokemonStore = defineStore('pokemon', {
         console.error('Error fetching Pokemons:', error);
       }
     },
-    async selectPokemonTeam(pokemon) {
-      console.log('🚀 ~ selectPokemonTeam ~ pokemon:', pokemon)
-      const pokemonIndex = this.teamPokemon.findIndex(element => element.id === pokemon.id)
-      if (this.teamPokemon.length === 6 && pokemonIndex < 0) return
-
-      console.log('🚀 ~ selectPokemonTeam ~ pokemonIndex:', pokemonIndex)
+    selectPokemonTeam(pokemon: Pokemon) {
+      const pokemonIndex = this.teamPokemon.findIndex(element => element.id === pokemon.id);
+      if (this.teamPokemon.length === 6 && pokemonIndex < 0) return;
 
       if (pokemonIndex >= 0) {
-          this.teamPokemon.splice(pokemonIndex, 1);
-      }
-      else {
+        this.teamPokemon.splice(pokemonIndex, 1);
+      } else {
         this.teamPokemon = [...this.teamPokemon, pokemon];
       }
     }    

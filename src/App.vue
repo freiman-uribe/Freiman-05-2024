@@ -8,7 +8,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import Nav from "./components/atoms/Nav.vue";
+import Nav from "./components/atoms/Nav.vue";
 
 </script>
 

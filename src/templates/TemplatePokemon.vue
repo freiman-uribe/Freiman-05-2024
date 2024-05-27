@@ -1,7 +1,5 @@
 <!-- ProjectsTemplate.vue -->
 <template>
-
-    <Nav />
     <div class="container">
         <slot name="title"></slot>
         <slot name="list"></slot>
